@@ -48,12 +48,15 @@ def toot(bot, text):
     try:
         t="@noyuno " + text
         logging.debug("toot :" + t)
-        bot.status_post(status=t, visibility="private")
+        bot.status_post(status=t, visibility="unlisted")
     except Exception as e:
         logging.error("unable to toot: " + t + "," + str(e))
 
 def execute(command):
-    logging.debug(subprocess.check_output(command,stderr=subprocess.STDOUT))
+    logging.debug("execute: " + " ".join(command))
+    o=subprocess.check_output(command,stderr=subprocess.STDOUT).decode("UTF-8")
+    logging.debug(o)
+    return o
 
 def main():
     global url
@@ -138,13 +141,11 @@ def main():
             toot(bot,"りょーかいです！")
             #pprint.pprint(toots)
             try:
-                logging.debug("git pull")
                 os.chdir("/var/pleroma/pleroma")
                 execute(["sudo","-u","pleroma","git","pull","origin","noyuno"])
-                toot(bot,"pull完了．再起動します．")
-                logging.debug("systemctl restart pleroma")
+                o=execute(["git","show","-s","--format=%h"])
+                toot(bot,"pull完了(commit id={0})．再起動します．".format(o.replace("\n","")))
                 execute(["systemctl", "restart", "pleroma"])
-                logging.debug("systemctl restart pleromabot")
                 execute(["systemctl", "restart", "pleromabot"])
                 # killed
                 #bot.toot("@noyuno 更新完了")
