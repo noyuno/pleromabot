@@ -10,7 +10,7 @@ ExecReload=/bin/kill $MAINPID
 KillMode=process
 Restart=on-failure
 RestartSec=15s
-StartLimitBurst=5
+StartLimitBurst=20
 
 [Install]
 WantedBy=multi-user.target

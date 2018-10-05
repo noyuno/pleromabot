@@ -144,10 +144,24 @@ def main():
                 os.chdir("/var/pleroma/pleroma")
                 execute(["sudo","-u","pleroma","git","pull","origin","noyuno"])
                 o=execute(["git","show","-s","--format=%h"])
-                toot(bot,"pull完了(commit id={0})．再起動します．".format(o.replace("\n","")))
-                time.sleep(3)
-                execute(["systemctl", "restart", "pleroma"])
-                time.sleep(3)
+                toot(bot,"pull完了(commit id={0})．10秒後システムが停止しバージョンアップします．".format(o.replace("\n","")))
+                time.sleep(10)
+                try:
+                    execute(["systemctl", "stop", "pleroma"])
+                except Exception as e:
+                    logging.warning(e)
+                try:
+                    execute(["/usr/local/bin/mix", "deps.get"])
+                except Exception as e:
+                    logging.warning(e)
+                try:
+                    execute(["/usr/local/bin/mix", "ecto.migrate"])
+                except Exception as e:
+                    logging.warning(e)
+                try:
+                    execute(["systemctl", "start", "pleroma"])
+                except Exception as e:
+                    logging.warning(e)
                 execute(["systemctl", "restart", "pleromabot"])
                 # killed
                 #bot.toot("@noyuno 更新完了")
