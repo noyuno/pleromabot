@@ -94,6 +94,7 @@ def main():
         }).json()
     except Exception as e:
         logging.error("unable to auth:"+str(e))
+        sys.exit(1)
 
     bot = Mastodon(
         client_id = secret,
@@ -151,11 +152,11 @@ def main():
                 except Exception as e:
                     logging.warning(e)
                 try:
-                    execute(["/usr/local/bin/mix", "deps.get"])
+                    execute(["sudo", "-u", "pleroma", "/usr/local/bin/mix", "deps.get"])
                 except Exception as e:
                     logging.warning(e)
                 try:
-                    execute(["/usr/local/bin/mix", "ecto.migrate"])
+                    execute(["sudo", "-u", "pleroma","/usr/local/bin/mix", "ecto.migrate"])
                 except Exception as e:
                     logging.warning(e)
                 try:
